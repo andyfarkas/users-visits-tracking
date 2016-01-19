@@ -13,6 +13,7 @@ mongoose.connect('mongodb://mongo/test', function(){
 events.on('user_joined', U.sequence([
   U.maybeGetProperty('username'),
   Visits.createNewVisitForUser,
+  Visits.saveVist,
   function(visit) {
     return U.sequence([
       U.maybeGetProperty('username'),

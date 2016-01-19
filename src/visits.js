@@ -13,18 +13,16 @@ module.exports = function(mongoose) {
     class Visits {
 
         static createNewVisitForUser(username) {
-            let deferred = Q.defer();
-
-            let visit = new Visit({
+            return new Visit({
                 username: username,
                 start: new Date()
             });
+        }
+
+        static saveVist(visit) {
+            let deferred = Q.defer();
 
             visit.save(function(error, visit) {
-                if (error) {
-                    return deferred.reject(new Error(error));
-                }
-
                 console.log('Visit has been created');
                 deferred.resolve(visit);
             });
