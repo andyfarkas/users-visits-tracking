@@ -14,13 +14,13 @@ events.on('user_joined', U.sequence([
     U.maybeGetProperty('username'),
     Visits.createNewVisitForUser,
     Visits.save,
-    function(visit) {
+    function attachVisitToUser(visit) {
         return U.sequence([
             U.maybeGetProperty('username'),
             Users.tryFindByUsername,
             U.either(
-                function(existingUser) {return existingUser;},
-                function() { return Users.createNew(visit.username);}
+                function returnExistingUser(existingUser) {return existingUser;},
+                function createNewUser() { return Users.createNew(visit.username);}
             ),
             Users.updateLastVisit(visit),
             Users.putOnline,
@@ -34,12 +34,12 @@ events.on('user_left', U.sequence([
     U.maybeGetProperty('username'),
     Users.tryFindByUsername,
     U.maybeOf,
-    function(user) {
+    function endVisitOfUser(user) {
         return U.sequence([
             Visits.getLastVisitForUser,
             Visits.end,
             Visits.save,
-            function(visit) {
+            function updateLastVisit(visit) {
                 return U.sequence([
                     Users.updateLastVisit(visit),
                     Users.putOffline,

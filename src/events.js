@@ -1,7 +1,6 @@
 'use strict';
 
 let amqp = require('amqplib/callback_api');
-let R = require('ramda');
 
 class Events {
 
@@ -25,32 +24,39 @@ class Events {
             }
         };
 
-        amqp.connect(host, function(error, conn) {
-            if (error) {
-                return console.log(error);
-            }
-            console.log('Connected to RabbitMQ');
+        connect();
 
-            conn.createChannel(function(error, ch) {
+        function connect() {
+            console.log('trying to connect to RabbitMQ ...');
+            amqp.connect(host, function(error, conn) {
                 if (error) {
+                    setTimeout(connect, 1000);
                     return console.log(error);
                 }
-                console.log('Channel created');
+                console.log('Connected to RabbitMQ');
 
-                ch.assertExchange('users', 'topic', {durable: false});
-
-                ch.assertQueue('', {exclusive: true}, function(error, q) {
+                conn.createChannel(function(error, ch) {
                     if (error) {
                         return console.log(error);
                     }
-                    console.log('Queue asserted');
+                    console.log('Channel created');
 
-                    ch.bindQueue(q.queue, 'users', 'user_joined');
-                    ch.bindQueue(q.queue, 'users', 'user_left');
-                    ch.consume(q.queue, fireEvent, {noAck: true});
+                    ch.assertExchange('users_events', 'direct', {durable: false});
+
+                    ch.assertQueue('', {exclusive: true}, function(error, q) {
+                        if (error) {
+                            return console.log(error);
+                        }
+                        console.log('Queue asserted');
+
+                        ch.bindQueue(q.queue, 'users_events', 'user_joined');
+                        ch.bindQueue(q.queue, 'users_events', 'user_left');
+                        ch.consume(q.queue, fireEvent, {noAck: true});
+                    });
                 });
             });
-        });
+        }
+
     }
 
     on(eventName, callback) {
