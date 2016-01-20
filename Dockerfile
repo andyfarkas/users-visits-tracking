@@ -4,4 +4,3 @@ COPY src /usr/src/app
 WORKDIR /usr/src/app
 RUN npm install
 CMD nodemon
-EXPOSE 3000
