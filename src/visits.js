@@ -19,12 +19,30 @@ module.exports = function(mongoose) {
             });
         }
 
-        static saveVist(visit) {
+        static save(visit) {
             let deferred = Q.defer();
 
             visit.save(function(error, visit) {
-                console.log('Visit has been created');
+                console.log('Visit has been saved');
                 deferred.resolve(visit);
+            });
+
+            return deferred.promise;
+        }
+
+        static end(visit) {
+            visit.end = new Date();
+            console.log('ending the visit');
+            return visit;
+        }
+
+        static getLastVisitForUser(user) {
+            let deferred = Q.defer();
+
+            Visit.findOne({
+                _id: user.lastVisit._id
+            }, function(error, visit) {
+                return deferred.resolve(visit);
             });
 
             return deferred.promise;

@@ -28,24 +28,32 @@ module.exports = function(mongoose) {
         return deferred.promise;
     };
 
-    Users.updateExistingUserLastVisit = R.curry(function(visit, user) {
+    Users.updateLastVisit = R.curry(function(visit, user) {
         console.log('existing user');
         user.lastVisit = visit;
-        user.isOnline = true;
         return user;
     });
 
-    Users.createNewUserWithLastVisit = R.curry(function(visit, user) {
-        console.log('new user');
+    Users.putOnline = function(user) {
+        user.isOnline = true;
+        return user;
+    };
+
+    Users.putOffline = function(user) {
+        user.isOnline = false;
+        return user;
+    };
+
+    Users.createNew = function(username) {
         return new User({
-            username: visit.username,
+            username: username,
             timeSpentOnline: 0,
-            lastVisit: visit,
+            lastVisit: null,
             isOnline: true
         });
-    });
+    };
 
-    Users.saveUser = function(user) {
+    Users.save = function(user) {
         let deferred = Q.defer();
 
         user.save(function(error) {

@@ -79,4 +79,14 @@ Utils.either = R.curry(function(truthy, falsy, value) {
     return falsy(value);
 });
 
+Utils.ifFalsy = function(f, value) {
+    return Utils.either(function(){
+        return value;
+    }, f);
+};
+
+Utils.maybeOf = function(value) {
+    return Maybe.of(value);
+};
+
 module.exports = Utils;
