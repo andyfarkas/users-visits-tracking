@@ -23,7 +23,6 @@ module.exports = function(mongoose) {
             let deferred = Q.defer();
 
             visit.save(function(error, visit) {
-                console.log('Visit has been saved');
                 deferred.resolve(visit);
             });
 
@@ -32,7 +31,6 @@ module.exports = function(mongoose) {
 
         static end(visit) {
             visit.end = new Date();
-            console.log('ending the visit');
             return visit;
         }
 

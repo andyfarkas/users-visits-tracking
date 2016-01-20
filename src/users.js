@@ -29,7 +29,6 @@ module.exports = function(mongoose) {
     };
 
     Users.updateLastVisit = R.curry(function(visit, user) {
-        console.log('existing user');
         user.lastVisit = visit;
         return user;
     });
