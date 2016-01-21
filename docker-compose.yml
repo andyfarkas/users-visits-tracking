@@ -8,6 +8,7 @@ rabbitmq:
 
 nodejs:
   image: nodejs-dev
+  build: users-visits
   ports:
     - "3000:3000"
   volumes:
