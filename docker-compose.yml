@@ -1,0 +1,17 @@
+mongo:
+  image: mongo
+
+rabbitmq:
+  image: rabbitmq:3-management
+  ports:
+    - "15672:15672"
+
+nodejs:
+  image: nodejs-dev
+  ports:
+    - "3000:3000"
+  volumes:
+    - ./src:/usr/src/app
+  links:
+    - mongo
+    - rabbitmq
