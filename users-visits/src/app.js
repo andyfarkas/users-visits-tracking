@@ -1,6 +1,6 @@
 'use strict';
 
-let events = require('./events')('amqp://rabbitmq');
+let eventsBus = require('./events');
 let mongoose = require('mongoose');
 let Visits = require('./visits')(mongoose);
 let Users = require('./users')(mongoose);
@@ -10,7 +10,16 @@ mongoose.connect('mongodb://mongo/test', function(){
   console.log('Connected to MongoDB');
 });
 
-events.on('user_joined', U.sequence([
+U.sequence([
+    eventsBus.connect,
+    eventsBus.attachTo('users_events'),
+    function(usersEvents) {
+        usersEvents.on('user_joined', onUserJoined);
+        usersEvents.on('user_left', onUserLeft);
+    }
+])('amqp://rabbitmq');
+
+let onUserJoined = U.sequence([
     U.maybeGetProperty('username'),
     Visits.createNewVisitForUser,
     Visits.save,
@@ -19,8 +28,8 @@ events.on('user_joined', U.sequence([
             U.maybeGetProperty('username'),
             Users.tryFindByUsername,
             U.either(
-                function returnExistingUser(existingUser) {return existingUser;},
-                function createNewUser() { return Users.createNew(visit.username);}
+                function returnExistingUser(existingUser) { return existingUser; },
+                function createNewUser() { return Users.createNew(visit.username); }
             ),
             Users.updateLastVisit(visit),
             Users.putOnline,
@@ -28,9 +37,9 @@ events.on('user_joined', U.sequence([
         ])(visit);
     },
     console.log
-]));
+]);
 
-events.on('user_left', U.sequence([
+let onUserLeft = U.sequence([
     U.maybeGetProperty('username'),
     Users.tryFindByUsername,
     U.maybeOf,
@@ -49,6 +58,6 @@ events.on('user_left', U.sequence([
         ])(user);
     },
     console.log
-]));
+]);
 
 

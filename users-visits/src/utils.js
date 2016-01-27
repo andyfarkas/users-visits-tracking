@@ -52,17 +52,21 @@ Utils.maybeGetProperty = R.curry(function(key, object) {
     return Maybe.of(R.prop(key, object));
 });
 
-Utils.then = R.curry(function(f, result) {
-
-    if (result instanceof Just || result instanceof Nothing) {
-        return result.map(f);
+Utils.then = R.curry(function(f, parameter) {
+    if (parameter instanceof Just || parameter instanceof Nothing) {
+        return parameter.map(f);
     }
 
-    if (result.__proto__.toString() == '[object Promise]') {
-        return result.then(f);
+    if (parameter && parameter.__proto__.toString() == '[object Promise]') {
+        return parameter.then(f);
     }
 
-    return f(result);
+    let result = f(parameter);
+    if (!result) {
+        return false;
+    }
+
+    return result;
 });
 
 Utils.sequence = function(arr) {
