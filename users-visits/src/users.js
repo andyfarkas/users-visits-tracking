@@ -28,7 +28,7 @@ module.exports = function(mongoose) {
         return deferred.promise;
     };
 
-    Users.updateLastVisit = R.curry(function(visit, user) {
+    Users.updateWithLastVisit = R.curry(function(visit, user) {
         user.lastVisit = visit;
         return user;
     });

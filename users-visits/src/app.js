@@ -31,7 +31,7 @@ let onUserJoined = U.sequence([
                 function returnExistingUser(existingUser) { return existingUser; },
                 function createNewUser() { return Users.createNew(visit.username); }
             ),
-            Users.updateLastVisit(visit),
+            Users.updateWithLastVisit(visit),
             Users.putOnline,
             Users.save
         ])(visit);
@@ -48,9 +48,9 @@ let onUserLeft = U.sequence([
             Visits.getLastVisitForUser,
             Visits.end,
             Visits.save,
-            function updateLastVisit(visit) {
+            function updateWithLastVisit(visit) {
                 return U.sequence([
-                    Users.updateLastVisit(visit),
+                    Users.updateWithLastVisit(visit),
                     Users.putOffline,
                     Users.save
                 ])(user);
