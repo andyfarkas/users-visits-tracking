@@ -70,7 +70,10 @@ Utils.then = R.curry(function(f, parameter) {
 });
 
 Utils.sequence = function(arr) {
-    return R.apply(R.pipe, arr.map(function(f) {
+    return R.apply(R.pipe, arr.map(function(f, index) {
+        if (f.length == 0) {
+            return f;
+        }
         return Utils.then(f);
     }));
 };

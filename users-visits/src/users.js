@@ -3,18 +3,11 @@
 let Q = require('q');
 let R = require('ramda');
 
-module.exports = function(mongoose) {
+module.exports = function(User) {
 
     class Users {
 
     }
-
-    const User = mongoose.model('User', {
-        username: String,
-        isOnline: Boolean,
-        timeSpentOnline: Number,
-        lastVisit: {}
-    });
 
     Users.tryFindByUsername = function(username) {
         let deferred = Q.defer();

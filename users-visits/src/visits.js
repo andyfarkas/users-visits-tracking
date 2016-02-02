@@ -2,13 +2,7 @@
 
 let Q = require('q');
 
-module.exports = function(mongoose) {
-
-    const Visit = mongoose.model('Visit', {
-        username: String,
-        start: Date,
-        end: Date
-    });
+module.exports = function(Visit) {
 
     class Visits {
 
