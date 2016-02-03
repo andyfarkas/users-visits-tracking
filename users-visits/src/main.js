@@ -1,7 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const EventsBus = require('./events')(
+const EventsBus = require('./../../modules/events-bus/src/events')(
     require('amqplib/callback_api'),
     'amqp://rabbitmq'
 );

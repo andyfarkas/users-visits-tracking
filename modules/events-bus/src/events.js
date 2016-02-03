@@ -2,9 +2,9 @@
 
 const Q = require('q');
 const R = require('ramda');
-const U = require('./utils');
+const U = require('../../utils/index');
 
-module.exports = function(amqp, host) {
+module.exports = function(amqp) {
 
     class EventsBus {
 
@@ -14,7 +14,7 @@ module.exports = function(amqp, host) {
 
     }
 
-    EventsBus.connect = function() {
+    EventsBus.connect = function(host) {
         var deferred = Q.defer();
 
         console.log('connecting to: ' + host);

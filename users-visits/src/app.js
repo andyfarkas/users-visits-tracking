@@ -1,6 +1,6 @@
 'use strict';
 
-const U = require('./utils');
+const U = require('./../../modules/utils/src/utils');
 const R = require('ramda');
 
 module.exports = function(

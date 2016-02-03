@@ -1,0 +1,13 @@
+{
+  "name": "events-bus",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "amqplib": "^0.4.0",
+    "q": "^1.4.1",
+    "ramda": "^0.19.1"
+  }
+}

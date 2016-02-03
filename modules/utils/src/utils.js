@@ -1,6 +1,6 @@
 'use strict';
 
-let R = require('ramda');
+const R = require('ramda');
 
 class Utils {
 
@@ -33,7 +33,6 @@ class Just {
     }
 
     map(f) {
-        console.log('mapping Just');
         return f(this.value);
     }
 
@@ -42,7 +41,6 @@ class Just {
 class Nothing {
 
     map(f) {
-        console.log('mapping Nothing');
         return this;
     }
 
