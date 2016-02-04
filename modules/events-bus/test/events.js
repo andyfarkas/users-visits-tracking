@@ -68,4 +68,25 @@ describe('EventsBus', function() {
         });
     });
 
+    describe('attachToExchange()', function() {
+        it('should create channel', function() {
+            const EventsBus = require('../src/events')({});
+            const connection = expect('createChannel');
+            connection.once();
+            EventsBus.attachToExchange('exchange-name', connection.getMock());
+        });
+
+        //it('should assert exchange to channel', function() {
+        //    const EventsBus = require('../src/events')({});
+        //    const channel = expect('assertExchange');
+        //    channel.once().with('exchange', 'direct', {durable: false});
+        //    const connection = {
+        //        createChannel: function(callback) {
+        //            callback(null, channel.getMock());
+        //        }
+        //    };
+        //    EventsBus.attachToExchange('exchange-name', connection);
+        //});
+    });
+
 });
