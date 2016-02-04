@@ -8,24 +8,19 @@ module.exports = function(amqp) {
 
     class EventsBus {
 
-        static connect() {}
+        static connect(host) {}
 
-        static attachTo(){}
+        static attachToExchange(){}
 
     }
 
     EventsBus.connect = function(host) {
         var deferred = Q.defer();
-
-        console.log('connecting to: ' + host);
         let connect = function() {
             amqp.connect(host, function(error, connection) {
-                console.log('trying to connect to RabbitMQ ...');
                 if (error) {
                     return setTimeout(connect, 1000);
                 }
-
-                console.log('Connected to RabbitMQ');
 
                 return deferred.resolve(connection);
             });
@@ -36,7 +31,7 @@ module.exports = function(amqp) {
         return deferred.promise;
     };
 
-    EventsBus.attachTo = R.curry(function(exchange, connection) {
+    EventsBus.attachToExchange = R.curry(function(exchange, connection) {
         let deferred = Q.defer();
 
         connection.createChannel(function(error, channel) {

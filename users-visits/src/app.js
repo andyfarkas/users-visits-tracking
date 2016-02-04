@@ -16,7 +16,7 @@ module.exports = function(
             U.sequence([
                 Mongo.connect,
                 EventsBus.connect,
-                EventsBus.attachTo('users_events'),
+                EventsBus.attachToExchange('users_events'),
                 function(usersEvents) {
                     usersEvents.on('user_joined', App.onUserJoined);
                     usersEvents.on('user_left', App.onUserLeft);
