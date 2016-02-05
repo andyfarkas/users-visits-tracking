@@ -7,46 +7,94 @@ const each = R.addIndex(R.forEach);
 
 class Mockz {
 
-    static expect(method) {
+    static mock(obj) {
 
-        let obj = {};
-        let calls = [];
-        obj[method] = function() {
-            calls.push({
-                args: arguments
-            });
-        };
+        let methods = {};
+        let calls = {};
 
-        let expectedArguments = undefined;
-        let expectedNumberOfCalls;
+        class Mocked {
 
-        return {
-            once: function() {
-                expectedNumberOfCalls = 1;
-                return {
-                    with: function() {
-                        expectedArguments = arguments;
+            static method(method) {
+
+                obj[method] = function() {
+                    if (!calls[method]) {
+                        calls[method] = [];
                     }
-                }
-            },
 
-            verify: function() {
-                if (calls.length !== expectedNumberOfCalls) {
-                    throw Error('Expected "' + method + '" to be called ' + expectedNumberOfCalls + ' times. But was called ' + calls.length + ' times.');
+                    calls[method].push({
+                        args: arguments
+                    })
+                };
+
+                if (!methods[method]) {
+                    methods[method] = [];
                 }
 
-                if (expectedArguments !== undefined) {
-                    each(function(value, index) {
-                        assert.deepEqual(value, calls[0].args[index]);
-                    }, expectedArguments);
-                }
-            },
+                class MockedMethod {
 
-            getMock: function() {
+                    static once() {
+
+                        methods[method].push({
+                            calls: 1
+                        });
+
+                        let index = methods[method].length - 1;
+
+                        class CallsNumber {
+
+                            static with() {
+                                methods[method][index].args = arguments;
+                            }
+
+                        }
+
+                        return CallsNumber;
+                    }
+
+                }
+
+                return MockedMethod;
+
+            }
+
+            static getMock() {
                 return obj;
             }
+
+            static verify() {
+                R.forEach(function(method) {
+                    let methodExpectedCalls = methods[method];
+                    each(function(call, index) {
+                        if (!calls[method]) {
+                            throw Error('Method "'+method+'()" expected to be called.');
+                        }
+
+                        if (calls[method].length > methods[method].length) {
+                            throw Error('Method "'+method+'()" expected to be called ' + (methods[method].length) + ' times, but called ' + calls[method].length + ' times.');
+                        }
+
+                        if (!calls[method][index]) {
+                            throw Error('Method "'+method+'()" expected to be called ' + (index+1) + ' times, but called ' + index + ' times.');
+                        }
+
+                        if (call.args) {
+                            let expectedArgs = R.keys(call.args);
+                            R.forEach(function(argKey) {
+                                assert.deepEqual(call.args[argKey], calls[method][index].args[argKey]);
+                            }, expectedArgs);
+                        }
+
+                    }, methodExpectedCalls);
+                }, R.keys(methods));
+                //
+                //each(methods, function(value, key) {
+                //    console.log(key);
+                //});
+            }
+
         }
 
+        return Mocked;
     }
 
 }

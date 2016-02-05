@@ -1,6 +1,6 @@
 'use strict';
 
-const expect = require('./mockz').expect;
+const mock = require('./mockz').mock;
 const assert = require('assert');
 const sinon = require('sinon');
 
@@ -9,12 +9,12 @@ describe('EventsBus', function() {
 
         it('should connect to host using the amqp client', function() {
             let expectedHost = 'amqp_url';
-            let amqpToBeCalled = expect('connect');
-            amqpToBeCalled.once().with(expectedHost);
-            const EventsBus = require('../src/events')(amqpToBeCalled.getMock());
+            let amqpMock = mock({});
+            amqpMock.method('connect').once().with(expectedHost);
+            const EventsBus = require('../src/events')(amqpMock.getMock());
 
             EventsBus.connect(expectedHost);
-            amqpToBeCalled.verify();
+            amqpMock.verify();
         });
 
         it('should return connection as a promise', function(done) {
@@ -71,22 +71,24 @@ describe('EventsBus', function() {
     describe('attachToExchange()', function() {
         it('should create channel', function() {
             const EventsBus = require('../src/events')({});
-            const connection = expect('createChannel');
-            connection.once();
-            EventsBus.attachToExchange('exchange-name', connection.getMock());
+            const connectionMock = mock({});
+            connectionMock.method('createChannel').once();
+            EventsBus.attachToExchange('exchange-name', connectionMock.getMock());
+            connectionMock.verify();
         });
 
-        //it('should assert exchange to channel', function() {
-        //    const EventsBus = require('../src/events')({});
-        //    const channel = expect('assertExchange');
-        //    channel.once().with('exchange', 'direct', {durable: false});
-        //    const connection = {
-        //        createChannel: function(callback) {
-        //            callback(null, channel.getMock());
-        //        }
-        //    };
-        //    EventsBus.attachToExchange('exchange-name', connection);
-        //});
+        it('should assert exchange to channel', function() {
+            const EventsBus = require('../src/events')({});
+            const channelMock = mock({});
+            channelMock.method('assertQueue');
+            channelMock.method('assertExchange').once().with('exchange', 'direct', {durable: false});
+            const connection = {
+                createChannel: function(callback) {
+                    callback(null, channelMock.getMock());
+                }
+            };
+            EventsBus.attachToExchange('exchange-name', connection);
+        });
     });
 
 });
