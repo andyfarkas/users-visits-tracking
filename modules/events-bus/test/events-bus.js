@@ -3,6 +3,7 @@
 const mock = require('./mockz').mock;
 const assert = require('assert');
 const sinon = require('sinon');
+const createEventsExchange = require('../src/events-exchange');
 
 describe('EventsBus', function() {
     describe('connect()', function() {
@@ -11,7 +12,7 @@ describe('EventsBus', function() {
             let expectedHost = 'amqp_url';
             let amqpMock = mock({});
             amqpMock.method('connect').once().with(expectedHost);
-            const EventsBus = require('../src/events')(amqpMock.getMock());
+            const EventsBus = require('../src/events-bus')(amqpMock.getMock());
 
             EventsBus.connect(expectedHost);
             amqpMock.verify();
@@ -26,15 +27,11 @@ describe('EventsBus', function() {
                     return callback(null, expectedConnection);
                 }
             };
-            const EventsBus = require('../src/events')(amqpFakeApi);
+            const EventsBus = require('../src/events-bus')(amqpFakeApi);
 
-            let returnedConnection = null;
             EventsBus.connect('amqp_url').then(function(connection) {
-                returnedConnection = connection;
-            }).done(function() {
-                assert.deepEqual(returnedConnection, expectedConnection);
-                done();
-            });
+                assert.deepEqual(expectedConnection, connection);
+            }).done(done);
 
         });
 
@@ -53,16 +50,12 @@ describe('EventsBus', function() {
                     return callback(null, expectedConnection);
                 }
             };
-            const EventsBus = require('../src/events')(amqpApi);
+            const EventsBus = require('../src/events-bus')(amqpApi);
 
-            let returnedConnection = null;
             let clock = sinon.useFakeTimers();
             EventsBus.connect('amqp_url').then(function(connection) {
-                returnedConnection = connection;
-            }).done(function() {
-                assert.deepEqual(returnedConnection, expectedConnection);
-                done();
-            });
+                assert.deepEqual(expectedConnection, connection);
+            }).done(done);
             clock.tick(1000);
             clock.restore();
         });
@@ -70,7 +63,7 @@ describe('EventsBus', function() {
 
     describe('attachToExchange()', function() {
         it('should create channel', function() {
-            const EventsBus = require('../src/events')({});
+            const EventsBus = require('../src/events-bus')({});
             const connectionMock = mock({});
             connectionMock.method('createChannel').once();
             EventsBus.attachToExchange('exchange-name', connectionMock.getMock());
@@ -78,16 +71,53 @@ describe('EventsBus', function() {
         });
 
         it('should assert exchange to channel', function() {
-            const EventsBus = require('../src/events')({});
+            const EventsBus = require('../src/events-bus')({});
             const channelMock = mock({});
             channelMock.method('assertQueue');
-            channelMock.method('assertExchange').once().with('exchange', 'direct', {durable: false});
+            channelMock.method('assertExchange').once().with('exchange-name', 'direct', {durable: false});
             const connection = {
                 createChannel: function(callback) {
                     callback(null, channelMock.getMock());
                 }
             };
             EventsBus.attachToExchange('exchange-name', connection);
+            channelMock.verify();
+        });
+
+        it('should assert queue to channel', function() {
+            const EventsBus = require('../src/events-bus')({});
+            const channelMock = mock({});
+            channelMock.method('assertExchange');
+            channelMock.method('assertQueue').once().with('', { exclusive: true });
+            const connection = {
+                createChannel: function(callback) {
+                    callback(null, channelMock.getMock());
+                }
+            };
+            EventsBus.attachToExchange('exchange-name', connection);
+            channelMock.verify();
+        });
+
+        it('should return events exchange in promise', function(done) {
+            const EventsBus = require('../src/events-bus')({});
+            const queueFake = {};
+            const channelMock = mock({
+                assertQueue: function(queueName, options, callback) {
+                    return callback(null, queueFake);
+                }
+            });
+            channelMock.method('assertExchange');
+            channelMock.method('consume');
+            const channelFake = channelMock.getMock();
+            const connection = {
+                createChannel: function(callback) {
+                    callback(null, channelFake);
+                }
+            };
+
+            EventsBus.attachToExchange('exchange-name', connection).then(function(EventsExchange) {
+                assert(EventsExchange);
+            }).done(done);
         });
     });
 
