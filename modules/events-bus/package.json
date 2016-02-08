@@ -9,5 +9,8 @@
     "amqplib": "^0.4.0",
     "q": "^1.4.1",
     "ramda": "^0.19.1"
+  },
+  "devDependencies": {
+    "fake-mocha": "^0.1.0"
   }
 }

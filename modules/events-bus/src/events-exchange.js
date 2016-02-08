@@ -3,7 +3,7 @@
 const R = require('ramda');
 const U = require('../../utils/index');
 
-module.exports = function(exchange, channel, queue) {
+module.exports = function(exchangeName, channel, queue) {
 
     const listeners = [];
     channel.consume(queue.queue, handleMessage(listeners), { noAck: true });
@@ -17,10 +17,12 @@ module.exports = function(exchange, channel, queue) {
     EventsExchange.on = R.curry(function(eventName, callback) {
         listeners[eventName] = U.sequence([
             R.prop(eventName),
-            U.ifFalsy(function() { return []; }),
+            U.default([]),
             function(listeners) {
+                if (listeners.length < 1) {
+                    channel.bindQueue(queue.queue, exchangeName, eventName);
+                }
                 listeners.push(callback);
-                channel.bindQueue(queue.queue, exchange, eventName);
                 return listeners;
             }
         ])(listeners);

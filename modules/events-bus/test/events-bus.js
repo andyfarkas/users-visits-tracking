@@ -3,7 +3,6 @@
 const mock = require('./mockz').mock;
 const assert = require('assert');
 const sinon = require('sinon');
-const createEventsExchange = require('../src/events-exchange');
 
 describe('EventsBus', function() {
     describe('connect()', function() {

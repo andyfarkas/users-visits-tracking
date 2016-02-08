@@ -84,7 +84,7 @@ Utils.either = R.curry(function(truthy, falsy, value) {
     return falsy(value);
 });
 
-Utils.orDefault = R.curry(function(defaultValue, value) {
+Utils.default = R.curry(function(defaultValue, value) {
     if (value) {
         return value;
     }
