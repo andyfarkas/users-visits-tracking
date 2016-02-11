@@ -10,23 +10,21 @@ module.exports = function(exchangeName, channel, queue) {
 
     class EventsExchange {
 
-        static on(eventName, callback) { }
+        static on(eventName, callback) {
+            listeners[eventName] = U.sequence([
+                R.prop(eventName),
+                U.default([]),
+                function(listeners) {
+                    if (listeners.length < 1) {
+                        channel.bindQueue(queue.queue, exchangeName, eventName);
+                    }
+                    listeners.push(callback);
+                    return listeners;
+                }
+            ])(listeners);
+        }
 
     }
-
-    EventsExchange.on = R.curry(function(eventName, callback) {
-        listeners[eventName] = U.sequence([
-            R.prop(eventName),
-            U.default([]),
-            function(listeners) {
-                if (listeners.length < 1) {
-                    channel.bindQueue(queue.queue, exchangeName, eventName);
-                }
-                listeners.push(callback);
-                return listeners;
-            }
-        ])(listeners);
-    });
 
     return EventsExchange;
 };
