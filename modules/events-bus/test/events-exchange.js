@@ -44,6 +44,43 @@ describe('EventsExchange', function() {
             EventsExchange.on('event-name', function(){});
             channelMock.verify();
         });
+
+        it('should notify event listeners if the event was fired', function(done) {
+            const queueFake = { queue: { } };
+            let sendPayloadToEventBus = function(){};
+            const channelMock = mock({
+                consume: function(queue, callback, options) {
+                     sendPayloadToEventBus = callback;
+                }
+            });
+            channelMock.method('bindQueue');
+            const EventsExchange = createEventsExchange(
+                'exchange-name',
+                channelMock.getMock(),
+                queueFake
+            );
+
+            const expectedMessage = {
+                message: 'hello'
+            };
+            EventsExchange.on('event-name', function(message){
+                assert.deepEqual(message, expectedMessage);
+                done();
+            });
+
+            const payload = {
+                content: {
+                    toString: function() {
+                        return '{"message": "hello"}';
+                    }
+                },
+                fields: {
+                    routingKey: 'event-name'
+                }
+            };
+
+            sendPayloadToEventBus(payload);
+        });
     });
 });
 

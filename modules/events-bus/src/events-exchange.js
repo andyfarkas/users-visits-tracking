@@ -68,8 +68,8 @@ let getListenersForEvent = R.curry(function(listeners, eventName) {
     ])(listeners);
 });
 
-let notifyListeners = R.curry(function(jsonMessage, listeners) {
+let notifyListeners = R.curry(function(jsonMessage, callbacks) {
     return R.map(function(callback) {
         return callback(jsonMessage);
-    }, listeners);
+    }, callbacks);
 });

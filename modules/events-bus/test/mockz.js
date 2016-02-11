@@ -80,7 +80,7 @@ class Mockz {
                         if (call.args) {
                             let expectedArgs = R.keys(call.args);
                             R.forEach(function(argKey) {
-                                assert.deepEqual(call.args[argKey], calls[method][index].args[argKey]);
+                                assert.deepEqual(calls[method][index].args[argKey], call.args[argKey]);
                             }, expectedArgs);
                         }
 
