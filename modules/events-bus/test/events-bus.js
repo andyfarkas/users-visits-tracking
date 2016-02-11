@@ -1,6 +1,6 @@
 'use strict';
 
-const mock = require('./mockz').mock;
+const mock = require('./../../mockz/mockz').mock;
 const assert = require('assert');
 const sinon = require('sinon');
 

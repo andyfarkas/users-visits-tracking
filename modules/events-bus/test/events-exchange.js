@@ -1,7 +1,7 @@
 'use strict';
 
 const createEventsExchange = require('../src/events-exchange');
-const mock = require('./mockz').mock;
+const mock = require('./../../mockz/mockz').mock;
 const assert = require('assert');
 
 describe('EventsExchange', function() {

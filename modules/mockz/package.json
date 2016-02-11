@@ -1,0 +1,9 @@
+{
+  "name": "mockz",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "q": "^1.4.1",
+    "ramda": "^0.19.1"
+  }
+}
