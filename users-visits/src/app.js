@@ -12,18 +12,18 @@ module.exports = function(
 ) {
 
     class App {
-        static start() {
-            U.sequence([
-                Mongo.connect,
-                EventsBus.connect,
-                listenToUserEvents(EventsBus),
-                function(usersEvents) {
-                    usersEvents.on('user_joined', getOnUserJoinedHandler(Visits, Users));
-                    usersEvents.on('user_left', App.onUserLeft);
-                }
-            ])();
-        }
+        static start() { }
     }
+
+    App.start = U.sequence([
+        Mongo.connect,
+        EventsBus.connect,
+        listenToUserEvents(EventsBus),
+        function(usersEvents) {
+            usersEvents.on('user_joined', getOnUserJoinedHandler(Visits, Users));
+            usersEvents.on('user_left', App.onUserLeft);
+        }
+    ]);
 
     return App;
 };
