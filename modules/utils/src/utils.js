@@ -69,6 +69,10 @@ Utils.then = R.curry(function(f, parameter) {
 
 Utils.sequence = function(arr) {
     return R.apply(R.pipe, arr.map(function(f, index) {
+        if(typeof f !== 'function') {
+            throw Error('Function expected but got: ' + typeof f);
+        }
+
         if (f.length == 0) {
             return f;
         }

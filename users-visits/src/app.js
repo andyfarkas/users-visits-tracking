@@ -2,6 +2,7 @@
 
 const U = require('../../utils/index');
 const R = require('ramda');
+const getOnUserJoinedHandler = require('./on-user-joined');
 
 module.exports = function(
     EventsBus,
@@ -15,9 +16,9 @@ module.exports = function(
             U.sequence([
                 Mongo.connect,
                 EventsBus.connect,
-                listenTo('users_events'),
+                listenToUserEvents(EventsBus),
                 function(usersEvents) {
-                    usersEvents.on('user_joined', App.onUserJoined);
+                    usersEvents.on('user_joined', getOnUserJoinedHandler(Visits, Users));
                     usersEvents.on('user_left', App.onUserLeft);
                 }
             ])();
@@ -27,13 +28,10 @@ module.exports = function(
     return App;
 };
 
-const listenTo = R.curry(function(eventsGroup, eventsBusConnection) {
+const listenTo = R.curry(function(eventsGroup, EventsBus, eventsBusConnection) {
     return EventsBus.attachToExchange(eventsGroup, eventsBusConnection);
 });
-
-const onUserJoined = function() {
-
-};
+const listenToUserEvents = listenTo('user_events');
 
 //let getUsernameProperty = U.maybeGetProperty('username');
 //let createNewOrReturnExistingUser = R.curry(function(username, existingUser) {
@@ -64,7 +62,7 @@ const onUserJoined = function() {
 //    console.log
 //]);
 //
-//App.onUserLeft = U.sequence([
+//App.onUserLeft = U.sequence([k
 //    U.maybeGetProperty('username'),
 //    Users.tryFindByUsername,
 //    U.maybeOf,

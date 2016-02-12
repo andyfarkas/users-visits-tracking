@@ -23,7 +23,12 @@ class Mockz {
 
                     calls[method].push({
                         args: arguments
-                    })
+                    });
+
+                    let callIndex = calls[method].length -1;
+                    if (methods[method][callIndex] && methods[method][callIndex].returns) {
+                        return methods[method][callIndex].returns;
+                    }
                 };
 
                 if (!methods[method]) {
@@ -44,6 +49,15 @@ class Mockz {
 
                             static with() {
                                 methods[method][index].args = arguments;
+
+                                class Returns {
+                                    static returns(result) {
+                                        methods[method][index].returns = result;
+                                    }
+
+                                }
+
+                                return Returns;
                             }
 
                         }
@@ -80,16 +94,12 @@ class Mockz {
                         if (call.args) {
                             let expectedArgs = R.keys(call.args);
                             R.forEach(function(argKey) {
-                                assert.deepEqual(calls[method][index].args[argKey], call.args[argKey]);
+                                assert.deepEqual(calls[method][index].args[argKey], call.args[argKey], 'Call of method ' + method + '()');
                             }, expectedArgs);
                         }
 
                     }, methodExpectedCalls);
                 }, R.keys(methods));
-                //
-                //each(methods, function(value, key) {
-                //    console.log(key);
-                //});
             }
 
         }
